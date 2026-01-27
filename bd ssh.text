@@ -1,0 +1,42 @@
+sudo -i -u jenkins
+
+ssh-keygen -t ed25519 -f ~/.ssh/ec2_jenkins_key -C "jenkins@local"
+
+ls -l ~/.ssh
+cat ~/.ssh/ec2_jenkins_key.pub
+cat ~/.ssh/ec2_jenkins_key
+
+private key -- add-- jenkins - credentials --ssh username with key --- name - ec2-key
+
+ec2  login
+
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+nano ~/.ssh/authorized_keys
+paste - ssh key - ec2_jenkins_key.pub
+
+chmod 600 ~/.ssh/authorized_keys
+chown -R ubuntu:ubuntu ~/.ssh
+
+ssh-keygen -t ed25519 -f ~/.ssh/github_deploy_key -C "ec2-deploy-key"
+ls -l ~/.ssh
+cat ~/.ssh/github_deploy_key.pub
+Profile icon – under settings option – ssh and gpg keys --- add – new ssh key
+1 key – local ubuntu public ssh key
+2nd key – ec2 ssh public key
+
+nano ~/.ssh/config
+Paste:
+Host github.com
+    User git
+    IdentityFile ~/.ssh/github_deploy_key
+    IdentitiesOnly yes
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/config
+chmod 600 ~/.ssh/github_deploy_key
+chmod 644 ~/.ssh/github_deploy_key.pub
+ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+ssh -T git@github.com
+
+
+curl -fsSL https://get.docker.com | sudo sh && sudo usermod -aG docker $USER && newgrp docker
