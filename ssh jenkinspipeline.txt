@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    environment {
+        EC2_USER = "ubuntu"
+        EC2_IP = "13.127.200.202"
+        SSH_KEY = "ec2-key"
+
+        TEMP_DIR = "/tmp/eba-build"
+        IMAGE_NAME = "eba-app"
+        CONTAINER_NAME = "eba-container"
+        PORT = "3000"
+        GIT_BRANCH = "Sharmila"
+    }
+
+    stages {
+
+        stage('Build & Deploy on EC2') {
+            steps {
+                sshagent(credentials: ["${SSH_KEY}"]) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} '
+                        set -e
+
+                        echo "=== Create temp build directory ==="
+                        rm -rf ${TEMP_DIR}
+                        mkdir -p ${TEMP_DIR}
+                        cd ${TEMP_DIR}
+
+                        echo "=== Clone code from GitHub (deploy key) ==="
+                        git clone -b ${GIT_BRANCH} git@github.com:Sharmila127/eba.git .
+
+                        echo "=== Build Docker image ==="
+                        docker build -t ${IMAGE_NAME}:latest .
+
+                        echo "=== Remove source code from EC2 ==="
+                        cd /
+                        rm -rf ${TEMP_DIR}
+
+                        echo "=== Stop old container ==="
+                        docker stop ${CONTAINER_NAME} || true
+                        docker rm ${CONTAINER_NAME} || true
+
+                        echo "=== Run new container ==="
+                        docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${IMAGE_NAME}:latest
+
+                        echo "=== Deployment successful ==="
+                        docker ps | grep ${CONTAINER_NAME}
+                    '
+                    """
+                }
+            }
+        }
+    }
+}
+
