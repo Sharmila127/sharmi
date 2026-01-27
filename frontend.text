@@ -1,0 +1,91 @@
+S3 bucket create- enable public access-create
+properties- static web host- index.html
+permission- bucket policy
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::bucket name/*"
+        }
+    ]
+}
+
+
+cloud front distribution create
+error pages - edit - error response 400, 404 --- /index.html -- 200 ok
+
+iam credential- iam user create - s3 full access, cloudfrontfull access - create, and create accesskey and secret key.
+
+
+-repo- settings- secret & variable - actions- secretes
+--AWS_ACCESS_KEY   AWS_SECRET_KEY  AWS_REGION  CLOUDFRONT_ID
+
+github
+
+.github/workflows/deploy.yml
+
+name: Deploy Frontend to S3.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code 
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # Step 3: Remove package-lock.json & node_modules
+      - name: Remove package-lock.json & node_modules
+        run: |
+          rm -f package-lock.json
+          rm -rf node_modules
+
+      # Step 4: Clean npm cache
+      - name: Clean npm cache
+        run: npm cache clean --force
+
+      # Step 5: Install dependencies (ignore errors)
+      - name: Install dependencies
+        run: |
+          npm install --legacy-peer-deps --force
+      # Step 6: Build project (ignore TS errors)
+      - name: Build project
+        run: |
+          npx tsc --skipLibCheck || echo "Ignoring TS errors"
+          npx vite build
+
+      # Step 7: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 8: Sync dist/ folder to S3
+      - name: Sync to S3
+        run: aws s3 sync dist/ s3://front-end-eflow1 --delete
+
+      # Step 9: Invalidate CloudFront cache
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_ID }} \
+            --paths "/*"
