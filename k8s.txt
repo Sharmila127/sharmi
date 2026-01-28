@@ -1,0 +1,59 @@
+Kubernetes 
+•	Kubernetes is a container orchestration tool used to manage Docker containers.
+•	I use Kubernetes to deploy, scale, and manage applications automatically.
+•	Kubernetes helps keep the application running without downtime.
+
+Cluster & Nodes
+•	A Kubernetes cluster has one master node and multiple worker nodes.
+•	The master node controls the entire cluster.
+•	Worker nodes run the application containers.
+
+Pod
+•	A Pod is the smallest unit in Kubernetes.
+•	One pod can run one or more containers.
+•	In real time, I deploy applications inside pods.
+
+Deployment
+•	Deployment is used to manage application versions.
+•	I use deployment to update applications without downtime.
+•	Kubernetes creates new pods and removes old pods automatically.
+
+ReplicaSet & Scaling
+•	ReplicaSet ensures the required number of pods are running.
+•	I use auto-scaling to handle high traffic.
+•	If one pod goes down, Kubernetes creates a new pod automatically.
+
+Service
+•	Service is used to expose the application to users.
+•	It provides a stable IP address to access pods.
+•	I use NodePort or LoadBalancer services in real projects.
+
+ConfigMap & Secret
+•	ConfigMap is used to store application configuration data.
+•	Secret is used to store sensitive data like passwords and tokens.
+•	I never hard-code credentials inside the application.
+
+Namespace
+•	Namespace is used to separate environments like dev, test, and prod.
+•	It helps in resource management and access control.
+
+Health Checks
+•	Liveness probe checks whether the app is running or not.
+•	Readiness probe checks whether the app is ready to receive traffic.
+•	These help avoid application downtime.
+
+Rolling Update & Rollback
+•	Rolling update deploys new versions without stopping the app.
+•	If an issue occurs, I rollback to the previous version.
+•	This is very important in production environments.
+
+Monitoring & Logs
+•	I use Prometheus for monitoring Kubernetes metrics.
+•	I use Grafana to visualize performance data.
+•	Logs help me debug real-time issues quickly.
+
+Real-Time Scenario 
+•	If a pod crashes, Kubernetes restarts it automatically.
+•	If traffic increases, Kubernetes scales the pods automatically.
+•	This reduces manual work and improves application reliability.
+
