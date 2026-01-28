@@ -1,0 +1,86 @@
+What is Kubernetes Deployment YAML?
+A Deployment YAML file is a configuration file written in YAML (YAML Ain’t Markup Language) format, which Kubernetes uses to define the configuration of a Deployment.
+ This file describes how to run an application within Kubernetes by specifying things like the Docker image, the number of replicas (pods), environment variables, ports, and more.
+
+Why Use YAML for Kubernetes?
+YAML is widely used in Kubernetes because it is human-readable and easy to write, making it an ideal format for defining configurations. 
+It provides a clean and simple way to declare the desired state of your resources, such as Pods, Services, Deployments, and more.
+Kubernetes then takes care of applying that configuration to maintain the desired state.
+
+Example of a Deployment YAML file
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+Components of YAML File:
+
+apiVersion: Specifies the version of the Kubernetes API to be used, ensuring compatibility with the cluster (e.g., apps/v1 for deployments).
+
+kind: Defines the resource type being managed, such as deployment, guiding Kubernetes to handle the configuration correctly.
+
+metadata: Contains identifying information for the resource, including the name, namespace, and labels. This helps with resource management, organization, and troubleshooting.
+
+spec: Describes the desired state of the deployment, detailing pod configurations, container specs, and other settings. It serves as a blueprint for Kubernetes to maintain the deployment’s state.
+
+spec:replicas: Indicates the number of pod instances to run, ensuring high availability and scalability by maintaining the desired number of replicas.
+
+spec:selector: Defines criteria for identifying pods managed by the deployment, often using labels to manage pod groups.
+
+spec:template: Specifies the pod template, including metadata and configurations like container images and environment variables, ensuring consistency across pod deployments.
+
+Use-Case
+Common scenarios where deployments are used include the following:
+
+Deploy a ReplicaSet using a Deployment to manage the rollout. The ReplicaSet will automatically create Pods in the background. Monitor the rollout status to verify its success or failure.
+
+To modify the state of the Pods, update the PodTemplateSpec within the Deployment. This triggers the creation of a new ReplicaSet, and the Deployment oversees gradually shifting Pods from the old ReplicaSet to the new one. Each new ReplicaSet increments the Deployment’s revision number.
+
+If the Deployment’s current state becomes unstable, perform a rollback to a previous revision, which also updates the Deployment’s revision number.
+
+Scale the Deployment to handle increased load.
+
+Pause the Deployment’s rollout to implement multiple changes to its PodTemplateSpec, and resume the rollout to initiate a new one.
+
+Use the Deployment’s status to detect if a rollout is stuck.
+
+Finally, remove any unnecessary older ReplicaSets.
+
+Common Kubernetes Deployment Commands
+Here are some common kubectl commands you’ll use with Deployments:
+
+1) Apply a deployment YAML
+
+kubectl apply -f nginx-deployment.yaml
+2) Get Deployment Status
+
+kubectl get deployments
+3) Get Pods managed by a Deployment
+
+kubectl get pods -l app=nginx
+4) Scale a Deployment
+
+kubectl scale deployment nginx-deployment --replicas=5
+5) Update a Deployment
+
+kubectl set image deployment/nginx-deployment nginx=nginx:1.19
+6) Roll back to previous version
+
+kubectl rollout undo deployment/nginx-deployment
