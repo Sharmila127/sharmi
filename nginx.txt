@@ -1,0 +1,214 @@
+ What is NGINX?
+
+NGINX  is a high-performance web server and reverse proxy server.
+NGINX receives requests from users (browser/mobile), processes them, and sends responses back.
+It can act as:
+Web Server
+Reverse Proxy
+Load Balancer
+API Gateway
+SSL terminator
+
+ Why use NGINX?
+Because it is:
+ Very fast
+ Handles thousands of users with low memory
+ Lightweight
+ Stable
+ Easy to configure
+ Perfect for DevOps & Cloud
+
+Real reason companies use NGINX:
+ Apache = process/thread based (heavy)
+ NGINX = event-driven (light & scalable)
+
+That’s why:
+Netflix
+Amazon
+Google
+Flipkart
+Zomato
+use NGINX
+
+ When do we use NGINX?
+You use NGINX when:
+Situation Use NGINX
+Host a website
+Multiple backend servers
+Need load balancing
+Docker / Kubernetes apps
+SSL (HTTPS) handling 
+Reverse proxy required
+High traffic 
+
+
+ What exactly NGINX does?
+
+NGINX mainly does 6 jobs:
+1.	 Accept client requests
+2.	Serve static files (HTML, CSS, JS, images)
+3.	 Forward requests to backend servers
+4.	Balance load between servers
+5.	 Handle SSL (HTTPS)
+6.	Cache responses
+
+ NGINX Architecture 
+
+Apache (Old way)
+One process per request
+High memory usage 
+
+NGINX (Modern way)
+Event-driven
+Asynchronous
+Few worker processes handle many users
+
+This is why NGINX is fast.
+
+ How NGINX works (Request Flow)
+
+Step-by-step flow:
+1. User types http://myapp.com
+2. Request reaches NGINX
+3. NGINX checks configuration
+4. NGINX decides:
+Serve file ?
+Send to backend ?
+5. Backend sends response
+6. NGINX sends response to user
+
+ NGINX as a Web Server
+
+Example:
+server {
+    listen 80;
+    server_name myapp.com;
+
+    root /var/www/html;
+    index index.html;
+}
+
+ NGINX directly serves static files
+ No backend needed
+
+ NGINX as Reverse Proxy (MOST IMPORTANT)
+
+What is Reverse Proxy?
+
+  Client doesn’t know backend server.
+NGINX hides backend.
+
+Example:
+location / {
+    proxy_pass http://localhost:3000;
+}
+
+Flow:
+User → NGINX → App Server → NGINX → User
+
+Used in:
+Node.js
+Java
+Python
+Docker containers
+
+ NGINX as Load Balancer
+
+One app, multiple servers
+upstream backend {
+    server 10.0.0.1:3000;
+    server 10.0.0.2:3000;
+}
+
+server {
+    location / {
+        proxy_pass http://backend;
+    }
+}
+
+Load balancing methods:
+Round Robin (default)
+Least connections
+IP hash
+ NGINX with Docker 
+
+Example:
+NGINX → Docker container app
+proxy_pass http://app_container:3000;
+
+Used in:
+Jenkins pipelines
+EC2 deployments
+Kubernetes Ingress
+
+ NGINX with SSL (HTTPS)
+
+NGINX handles SSL so backend stays simple.
+listen 443 ssl;
+ssl_certificate /etc/nginx/ssl/app.crt;
+ssl_certificate_key /etc/nginx/ssl/app.key;
+
+Used with:
+Let’s Encrypt
+AWS ALB + NGINX
+Kubernetes TLS
+
+ Important NGINX Files & Paths
+
+File Purpose
+/etc/nginx/nginx.conf Main config
+/etc/nginx/sites-available/ Virtual hosts
+/etc/nginx/sites-enabled/ Active sites
+/var/log/nginx/access.log Access logs
+/var/log/nginx/error.log Error logs
+
+
+ NGINX Process Flow 
+1. Master Process
+Reads config
+Controls workers
+2. Worker Processes
+Handle requests
+Event-driven
+Non-blocking
+
+ NGINX Commands 
+
+nginx -t # Check config
+systemctl start nginx
+systemctl stop nginx
+systemctl restart nginx
+systemctl reload nginx
+
+ NGINX vs Apache 
+
+Feature NGINX Apache
+
+Architecture Event-driven Process-based
+Performance Very High Medium
+Memory Low High
+Best for High traffic Small sites
+
+
+
+ Where NGINX fits in DevOps Pipeline?
+
+Git → Jenkins → Docker → EC2/K8s
+                         |
+                       NGINX
+                         |
+                       Users
+
+NGINX is the front gate of production.
+
+
+
+ Real-time Example 
+ in your Jenkins → EC2 → Docker setup:
+Jenkins deploys container
+NGINX listens on port 80/443
+NGINX forwards traffic to container port 3000/5000
+Users never see container IP
+
+ One-line Interview Answer
+> NGINX is a high-performance, event-driven web server and reverse proxy used to handle client requests, load balance backend servers, and improve application scalability and security.
