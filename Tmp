@@ -1,0 +1,285 @@
+
+
+1️⃣ Real-Time Scenario (How companies actually work)
+
+Assume E-commerce / Booking app:
+
+Service	Tech
+
+frontend-service	React / Angular
+user-service	Java / Spring Boot
+order-service	Node.js
+payment-service	Python
+database	MySQL / MongoDB
+reverse-proxy	Nginx
+
+
+👉 Each service = separate repo OR mono-repo + separate Dockerfile
+
+
+---
+
+2️⃣ Folder Structure (Industry standard)
+
+microservices-app/
+│
+├── frontend/
+│   └── Dockerfile
+│
+├── user-service/
+│   └── Dockerfile
+│
+├── order-service/
+│   └── Dockerfile
+│
+├── payment-service/
+│   └── Dockerfile
+│
+├── nginx/
+│   └── nginx.conf
+│
+└── docker-compose.yml
+
+Interview sentence 👇
+
+> Each microservice is independently containerized and deployed using Docker.
+
+
+
+
+---
+
+3️⃣ Dockerfile – Backend Service (Java example)
+
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY target/user-service.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
+
+Best practice points (interviewer likes):
+
+Slim image
+
+Single responsibility
+
+Expose only required port
+
+
+
+---
+
+4️⃣ Dockerfile – Node.js Service
+
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json .
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm","start"]
+
+
+---
+
+5️⃣ Dockerfile – Frontend (React)
+
+FROM node:18-alpine as build
+WORKDIR /app
+COPY . .
+RUN npm install && npm run build
+
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+
+
+---
+
+6️⃣ Nginx Reverse Proxy (VERY IMPORTANT – 3+ yrs level)
+
+nginx/nginx.conf
+
+events {}
+
+http {
+  upstream user_service {
+    server user-service:8080;
+  }
+
+  upstream order_service {
+    server order-service:3000;
+  }
+
+  server {
+    listen 80;
+
+    location /api/users/ {
+      proxy_pass http://user_service;
+    }
+
+    location /api/orders/ {
+      proxy_pass http://order_service;
+    }
+  }
+}
+
+Interview line 👇
+
+> Nginx is used as an API gateway and reverse proxy for routing traffic to microservices.
+
+
+
+
+---
+
+7️⃣ docker-compose.yml (CORE PART)
+
+version: "3.8"
+
+services:
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8080"
+    networks:
+      - app-network
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    ports:
+      - "8082:3000"
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - user-service
+      - order-service
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - user-service
+      - order-service
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+
+---
+
+8️⃣ Deployment Commands (Real-Time)
+
+docker-compose build
+docker-compose up -d
+docker ps
+
+Access:
+
+Frontend → http://<IP>
+
+Users API → http://<IP>/api/users
+
+Orders API → http://<IP>/api/orders
+
+
+
+---
+
+9️⃣ Environment Variables (Production style)
+
+environment:
+  - DB_HOST=mysql
+  - DB_USER=admin
+  - DB_PASS=secret
+
+Best practice:
+
+.env file use
+
+No hardcoded secrets
+
+
+
+---
+
+🔟 Logs & Debugging (VERY IMPORTANT)
+
+docker-compose logs -f user-service
+docker inspect user-service
+docker exec -it user-service sh
+
+Interview sentence 👇
+
+> We debug container issues using logs, exec, and network inspection.
+
+
+
+
+---
+
+1️⃣1️⃣ CI/CD Flow (3+ yrs answer)
+
+1. Developer pushes code
+
+
+2. Jenkins builds Docker image
+
+
+3. Image pushed to Docker Hub / ECR
+
+
+4. Server pulls latest image
+
+
+5. docker-compose restart
+
+
+
+Pipeline line 👇
+
+> CI handles build & image creation, CD handles container deployment.
+
+
+
+
+---
+
+1️⃣2️⃣ Production Best Practices
+
+✅ Separate DB container
+✅ Resource limits
+
+deploy:
+  resources:
+    limits:
+      cpus: "0.5"
+      memory: 512M
+
+✅ Health checks
+
+healthcheck:
+  test: ["CMD","curl","-f","http://localhost:8080/health"]
+
+✅ Use Docker Swarm / Kubernetes later
+
+
+---
