@@ -71,10 +71,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Frontend deployed successfully to S3 and CloudFront cache invalidated"
+            echo "Frontend deployed successfully to S3 and CloudFront cache invalidated"
         }
         failure {
-            echo "❌ Deployment failed"
+            echo " Deployment failed"
         }
     }
 }
