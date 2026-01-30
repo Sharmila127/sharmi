@@ -1,7 +1,3 @@
-
-
-1️⃣ Real-Time Scenario (How companies actually work)
-
 Assume E-commerce / Booking app:
 
 Service	Tech
@@ -13,13 +9,10 @@ payment-service	Python
 database	MySQL / MongoDB
 reverse-proxy	Nginx
 
+ Each service = separate repo OR mono-repo + separate Dockerfile
 
-👉 Each service = separate repo OR mono-repo + separate Dockerfile
 
-
----
-
-2️⃣ Folder Structure (Industry standard)
+ Folder Structure 
 
 microservices-app/
 │
@@ -40,16 +33,13 @@ microservices-app/
 │
 └── docker-compose.yml
 
-Interview sentence 👇
+
 
 > Each microservice is independently containerized and deployed using Docker.
 
 
 
-
----
-
-3️⃣ Dockerfile – Backend Service (Java example)
+ Dockerfile – Backend Service (Java example)
 
 FROM openjdk:17-jdk-slim
 WORKDIR /app
@@ -57,7 +47,6 @@ COPY target/user-service.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]
 
-Best practice points (interviewer likes):
 
 Slim image
 
@@ -69,7 +58,7 @@ Expose only required port
 
 ---
 
-4️⃣ Dockerfile – Node.js Service
+ Dockerfile – Node.js Service
 
 FROM node:18-alpine
 WORKDIR /app
@@ -80,9 +69,7 @@ EXPOSE 3000
 CMD ["npm","start"]
 
 
----
-
-5️⃣ Dockerfile – Frontend (React)
+ Dockerfile – Frontend (React)
 
 FROM node:18-alpine as build
 WORKDIR /app
@@ -96,7 +83,7 @@ EXPOSE 80
 
 ---
 
-6️⃣ Nginx Reverse Proxy (VERY IMPORTANT – 3+ yrs level)
+ Nginx Reverse Proxy 
 
 nginx/nginx.conf
 
@@ -124,16 +111,11 @@ http {
   }
 }
 
-Interview line 👇
-
 > Nginx is used as an API gateway and reverse proxy for routing traffic to microservices.
 
 
 
-
----
-
-7️⃣ docker-compose.yml (CORE PART)
+ docker-compose.yml 
 
 version: "3.8"
 
@@ -186,7 +168,7 @@ networks:
 
 ---
 
-8️⃣ Deployment Commands (Real-Time)
+Deployment Commands 
 
 docker-compose build
 docker-compose up -d
@@ -204,69 +186,36 @@ Orders API → http://<IP>/api/orders
 
 ---
 
-9️⃣ Environment Variables (Production style)
+ Environment Variables 
 
 environment:
   - DB_HOST=mysql
   - DB_USER=admin
   - DB_PASS=secret
 
-Best practice:
+
 
 .env file use
-
-No hardcoded secrets
-
-
-
 ---
-
-🔟 Logs & Debugging (VERY IMPORTANT)
+Logs & Debugging 
 
 docker-compose logs -f user-service
 docker inspect user-service
 docker exec -it user-service sh
 
-Interview sentence 👇
-
-> We debug container issues using logs, exec, and network inspection.
-
-
-
-
----
-
-1️⃣1️⃣ CI/CD Flow (3+ yrs answer)
-
+ CI/CD Flow 
 1. Developer pushes code
-
-
 2. Jenkins builds Docker image
-
-
 3. Image pushed to Docker Hub / ECR
-
-
 4. Server pulls latest image
-
-
 5. docker-compose restart
 
-
-
-Pipeline line 👇
-
 > CI handles build & image creation, CD handles container deployment.
-
-
-
-
 ---
+ Production Best Practices
 
-1️⃣2️⃣ Production Best Practices
-
-✅ Separate DB container
-✅ Resource limits
+ Separate DB container
+ Resource limits
 
 deploy:
   resources:
@@ -274,12 +223,7 @@ deploy:
       cpus: "0.5"
       memory: 512M
 
-✅ Health checks
+ Health checks
 
 healthcheck:
   test: ["CMD","curl","-f","http://localhost:8080/health"]
-
-✅ Use Docker Swarm / Kubernetes later
-
-
----
